@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   // Relative base so the build works when served from a subpath, e.g.
   // GitHub Pages project sites at https://<user>.github.io/<repo>/.
-  base: './',
+  base: 'https://tentecopon.github.io/trip-master/',
   plugins: [
     react(),
     VitePWA({
