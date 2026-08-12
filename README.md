@@ -60,6 +60,58 @@ Page → Component → Custom Hook → Service → Dexie → IndexedDB
 
 ログイン・認証・複数ユーザー・クラウド同期・プッシュ通知・写真機能・1日複数WorkLog・複数テンプレート組み合わせ・高度な検索・削除データ復元は、設計書の方針通り本ベータ版には含まれていません。
 
+## GitHub Pagesへの公開手順
+
+`npm run build` は**ソースコードではなくビルド後の`dist/`フォルダ**を公開する必要があります（`vite.config.ts`の`base: './'`により、どのサブパスで配信されても相対パスで動くようになっています）。
+
+**方法A: GitHub Actions（推奨）**
+
+1. リポジトリの Settings → Pages → Source を「GitHub Actions」に設定
+2. `.github/workflows/deploy.yml` を作成:
+
+```yaml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+```
+
+3. `main`にpushすると自動でビルド・公開されます
+
+**方法B: 手動（gh-pagesパッケージ）**
+
+```bash
+npm install -D gh-pages
+npm run build
+npx gh-pages -d dist
+```
+
+その後 Settings → Pages → Source を「Deploy from a branch」→「gh-pages」に設定してください。
+
+**うまく表示されない場合の確認ポイント**
+
+- リポジトリ直下ではなく`dist/`の中身だけが公開されているか（`index.html`がPagesのルートに存在するか）
+- ブラウザの開発者ツール（F12）→ Consoleタブに404やCORSエラーが出ていないか
+- `index.html`内のscript/linkタグが `./assets/...` のような相対パスになっているか（絶対パス`/assets/...`だとサブパス配信時に壊れます。今回のビルド設定で修正済みです）
+
 ## 次にやること
 
 1. `public/icon-192.png` / `icon-512.png` を正式デザインに差し替え
