@@ -123,6 +123,23 @@ export function validateBackup(raw: string): ValidationOutcome {
     }
   }
 
+  // Templates now store due dates as offsets from a trip's start date.  Old
+  // backups contain absolute date strings, which cannot be converted without
+  // knowing the future trip, so retain the Todo and clear only its due date.
+  for (const template of data.templates) {
+    if (!Array.isArray(template.todos)) {
+      return { valid: false, reason: 'テンプレートのToDoが不正です。' }
+    }
+    for (const todo of template.todos) {
+      if (typeof todo.dueDate === 'string') {
+        todo.dueDate = null
+      }
+      if (todo.dueDate !== null && (!Number.isInteger(todo.dueDate) || todo.dueDate < 0)) {
+        return { valid: false, reason: 'テンプレートの予定日設定が不正です。' }
+      }
+    }
+  }
+
   const tripIds = new Set(data.trips.map(t => t.id))
   const validPhases = new Set(['before', 'onsite', 'after'])
   const validStatuses = new Set(['todo', 'doing', 'done'])

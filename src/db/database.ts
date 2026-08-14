@@ -40,6 +40,26 @@ export class TripManagerDB extends Dexie {
       settings: 'id',
       backups: 'id, createdAt'
     })
+
+    // Template due dates used to be stored as absolute date strings. They
+    // cannot be reliably converted without a trip start date, so reset them
+    // to "not set" and use relative day offsets from this version onward.
+    this.version(2).stores({
+      trips: 'id, status, startDate, endDate',
+      todos: 'id, tripId, phase, status, dueDate, order',
+      workLogs: 'id, tripId, date, [tripId+date]',
+      templates: 'id, machineId, purposeId',
+      machineMasters: 'id, name',
+      purposeMasters: 'id, name',
+      deleteLogs: 'id, deletedAt, dataType',
+      settings: 'id',
+      backups: 'id, createdAt'
+    }).upgrade(tx => tx.table('templates').toCollection().modify(template => {
+      template.todos = (template.todos ?? []).map((todo: { dueDate?: unknown }) => ({
+        ...todo,
+        dueDate: typeof todo.dueDate === 'number' ? todo.dueDate : null
+      }))
+    }))
   }
 }
 

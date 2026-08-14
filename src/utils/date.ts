@@ -13,6 +13,12 @@ export function dateToStr(d: Date): string {
   return `${y}-${m}-${day}`
 }
 
+/** Adds calendar days to a YYYY-MM-DD string in local time (not UTC). */
+export function addDays(dateStr: string, days: number): string {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return dateToStr(new Date(year, month - 1, day + days))
+}
+
 export function nowIso(): string {
   return new Date().toISOString()
 }

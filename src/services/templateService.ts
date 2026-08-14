@@ -2,7 +2,7 @@ import { db } from '@/db/database'
 import type { Template } from '@/types/template'
 import type { Todo } from '@/types/todo'
 import { generateId } from '@/utils/uuid'
-import { nowIso } from '@/utils/date'
+import { addDays, nowIso } from '@/utils/date'
 
 export async function getTemplates(): Promise<Template[]> {
   return db.templates.toArray()
@@ -36,8 +36,9 @@ export async function deleteTemplate(id: string): Promise<void> {
  * (Rule 4, §20) — editing one never touches the other.
  */
 export async function applyTemplate(templateId: string, tripId: string): Promise<Todo[]> {
-  const template = await db.templates.get(templateId)
+  const [template, trip] = await Promise.all([db.templates.get(templateId), db.trips.get(tripId)])
   if (!template) throw new Error('テンプレートが見つかりません。')
+  if (!trip) throw new Error('出張予定が見つかりません。')
 
   const now = nowIso()
   const newTodos: Todo[] = template.todos.map(tt => ({
@@ -46,7 +47,9 @@ export async function applyTemplate(templateId: string, tripId: string): Promise
     title: tt.title,
     phase: tt.phase,
     status: 'todo',
-    dueDate: tt.dueDate,
+    // Template dates are offsets from the trip's start date.  A generated
+    // Todo always stores a concrete YYYY-MM-DD date, independent of template.
+    dueDate: tt.dueDate === null ? null : addDays(trip.startDate, tt.dueDate),
     comment: '',
     order: tt.order,
     createdAt: now,

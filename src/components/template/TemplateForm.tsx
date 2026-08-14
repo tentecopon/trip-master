@@ -3,7 +3,6 @@ import type { Template, TemplateTodo } from '@/types/template'
 import type { TodoPhase } from '@/types/todo'
 import type { MachineMaster, PurposeMaster } from '@/types/master'
 import { Button } from '@/components/common/Button'
-import { DateInput } from '@/components/common/DateInput'
 
 interface Props {
   machines: MachineMaster[]
@@ -54,6 +53,10 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
       setError('すべてのToDoにタイトルを入力してください。')
       return
     }
+    if (todos.some(t => t.dueDate !== null && (!Number.isInteger(t.dueDate) || t.dueDate < 0))) {
+      setError('開始日からの日数は0以上の整数で入力してください。')
+      return
+    }
     setError(null)
     await onSave({ machineId: machineId || null, machineName, purposeId: purposeId || null, purposeName, todos })
   }
@@ -101,7 +104,18 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
               value={t.title}
               onChange={e => updateRow(i, { title: e.target.value })}
             />
-            <DateInput value={t.dueDate} onChange={v => updateRow(i, { dueDate: v })} />
+            <label className="field">
+              <span className="field-label">開始日から（日後）</span>
+              <input
+                type="number"
+                className="field-input"
+                min="0"
+                step="1"
+                placeholder="未設定"
+                value={t.dueDate ?? ''}
+                onChange={e => updateRow(i, { dueDate: e.target.value === '' ? null : Number(e.target.value) })}
+              />
+            </label>
             <Button type="button" variant="danger" onClick={() => removeRow(i)}>削除</Button>
           </li>
         ))}
