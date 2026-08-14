@@ -254,7 +254,7 @@ a { color: inherit; text-decoration: none; }
    Trip detail
 ------------------------------------------------------------------------ */
 
-.trip-detail-header { margin-bottom: 12px; }
+.trip-detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .trip-detail-badges { display: flex; gap: 8px; margin-top: 4px; }
 
 .trip-info-card {
@@ -275,6 +275,19 @@ a { color: inherit; text-decoration: none; }
 .trip-info-grid dd { margin: 0; font-size: 14px; }
 
 .trip-detail-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+
+.trip-memo-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.trip-memo-editor .todo-section-header { margin-bottom: 0; }
+.trip-memo-editor textarea { width: 100%; resize: vertical; }
 
 /* ---------------------------------------------------------------------
    Todo sections

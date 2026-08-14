@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTrip } from '@/hooks/useTrip'
 import { useTodos } from '@/hooks/useTodos'
 import { useWorkLogs } from '@/hooks/useWorkLogs'
@@ -22,12 +22,18 @@ export function TripDetailPage() {
   const navigate = useNavigate()
   const { show } = useToast()
 
-  const { trip, loading, complete, reopen, remove, checkIncompleteTodos } = useTrip(tripId)
+  const { trip, loading, update, complete, reopen, remove, checkIncompleteTodos } = useTrip(tripId)
   const todosApi = useTodos(tripId)
   const workLogsApi = useWorkLogs(tripId)
 
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [confirmComplete, setConfirmComplete] = useState(false)
+  const [notes, setNotes] = useState('')
+  const [savingNotes, setSavingNotes] = useState(false)
+
+  useEffect(() => {
+    setNotes(trip?.notes ?? '')
+  }, [trip?.id, trip?.notes])
 
   if (loading) return <Loading />
   if (!trip) return <div className="page"><p>出張が見つかりませんでした。</p></div>
@@ -54,6 +60,19 @@ export function TripDetailPage() {
     }
   }
 
+  async function handleNotesSave() {
+    if (!trip || notes === trip.notes) return
+    setSavingNotes(true)
+    try {
+      await update({ notes })
+      show('メモを保存しました。')
+    } catch {
+      show('メモを保存できませんでした。', 'error')
+    } finally {
+      setSavingNotes(false)
+    }
+  }
+
   return (
     <div className="page">
       <div className="trip-detail-header">
@@ -64,6 +83,7 @@ export function TripDetailPage() {
             <TripStatusBadge status={trip.status} />
           </div>
         </div>
+        <Link to={`/trips/${trip.id}/edit`}><Button variant="secondary">編集</Button></Link>
       </div>
 
       <section className="trip-info-card">
@@ -72,17 +92,36 @@ export function TripDetailPage() {
           <dt>期間</dt><dd>{formatDateJp(trip.startDate)} 〜 {formatDateJp(trip.endDate)}</dd>
           <dt>目的</dt><dd>{trip.purposeName}</dd>
           {trip.companions && <><dt>同行者</dt><dd>{trip.companions}</dd></>}
-          {trip.notes && <><dt>メモ</dt><dd>{trip.notes}</dd></>}
         </dl>
+      </section>
+
+      <section className="trip-memo-editor">
+        <div className="todo-section-header"><h3>メモ</h3></div>
+        <textarea
+          className="field-input"
+          rows={3}
+          value={notes}
+          placeholder="メモを入力"
+          onChange={e => setNotes(e.target.value)}
+        />
+        <Button variant="secondary" onClick={handleNotesSave} disabled={savingNotes || notes === trip.notes}>
+          {savingNotes ? '保存中…' : 'メモを保存'}
+        </Button>
       </section>
 
       <WorkLogSection
         trip={trip}
         workLogs={workLogsApi.workLogs}
         todayLog={workLogsApi.todayLog}
-        onStart={workLogsApi.start}
-        onEnd={workLogsApi.end}
-        onUpdate={workLogsApi.update}
+        onStart={async () => {
+          try { await workLogsApi.start() } catch (e) { show((e as Error).message, 'error') }
+        }}
+        onEnd={async () => {
+          try { await workLogsApi.end() } catch (e) { show((e as Error).message, 'error') }
+        }}
+        onUpdate={async (id, input) => {
+          try { await workLogsApi.update(id, input) } catch (e) { show((e as Error).message, 'error'); throw e }
+        }}
       />
 
       <TodoSection

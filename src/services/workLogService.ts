@@ -48,6 +48,14 @@ export async function updateWorkLog(
   id: string,
   input: Partial<Pick<WorkLog, 'date' | 'startTime' | 'endTime'>>
 ): Promise<void> {
+  const current = await db.workLogs.get(id)
+  if (!current) throw new Error('作業時間が見つかりません。')
+
+  const date = input.date ?? current.date
+  if (date !== current.date) {
+    const duplicate = await getWorkLog(current.tripId, date)
+    if (duplicate) throw new Error('この日の作業時間は既に登録されています。')
+  }
   await db.workLogs.update(id, { ...input, updatedAt: nowIso() })
 }
 
