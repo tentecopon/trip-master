@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Template, TemplateTodo } from '@/types/template'
 import type { TodoPhase } from '@/types/todo'
 import type { MachineMaster, PurposeMaster } from '@/types/master'
@@ -22,6 +22,17 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
   const [purposeName, setPurposeName] = useState(initial?.purposeName ?? '')
   const [todos, setTodos] = useState<TemplateTodo[]>(initial?.todos ?? [])
   const [error, setError] = useState<string | null>(null)
+
+  // React Router reuses this form when the edit target changes.  Keep its
+  // controlled fields in sync with the template that was actually selected.
+  useEffect(() => {
+    setMachineId(initial?.machineId ?? '')
+    setMachineName(initial?.machineName ?? '')
+    setPurposeId(initial?.purposeId ?? '')
+    setPurposeName(initial?.purposeName ?? '')
+    setTodos(initial?.todos.map(todo => ({ ...todo })) ?? [])
+    setError(null)
+  }, [initial?.id])
 
   function addRow() {
     setTodos(prev => [...prev, { title: '', phase: 'before', dueDate: null, order: prev.length }])

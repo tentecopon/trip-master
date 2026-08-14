@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Todo, TodoInput, TodoPhase } from '@/types/todo'
 import { Modal } from '@/components/common/Modal'
 import { Button } from '@/components/common/Button'
@@ -19,6 +19,16 @@ export function TodoEditModal({ open, phase, initial, onClose, onSave, onDelete 
   const [dueDate, setDueDate] = useState<string | null>(initial?.dueDate ?? null)
   const [comment, setComment] = useState(initial?.comment ?? '')
   const [error, setError] = useState<string | null>(null)
+
+  // The modal stays mounted while a different ToDo is selected.  Reset the
+  // controlled fields each time it opens so the selected record is loaded.
+  useEffect(() => {
+    if (!open) return
+    setTitle(initial?.title ?? '')
+    setDueDate(initial?.dueDate ?? null)
+    setComment(initial?.comment ?? '')
+    setError(null)
+  }, [open, initial?.id])
 
   async function handleSave() {
     if (!title.trim()) {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { WorkLog } from '@/types/workLog'
 import { Modal } from '@/components/common/Modal'
 import { Button } from '@/components/common/Button'
@@ -15,6 +15,13 @@ export function WorkLogEditModal({ open, workLog, onClose, onSave }: Props) {
   const [date, setDate] = useState(workLog.date)
   const [startTime, setStartTime] = useState(workLog.startTime)
   const [endTime, setEndTime] = useState(workLog.endTime)
+
+  useEffect(() => {
+    if (!open) return
+    setDate(workLog.date)
+    setStartTime(workLog.startTime)
+    setEndTime(workLog.endTime)
+  }, [open, workLog.id])
 
   async function handleSave() {
     await onSave({ date, startTime, endTime })

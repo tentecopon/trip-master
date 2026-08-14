@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { TripInput } from '@/types/trip'
 import type { MachineMaster, PurposeMaster } from '@/types/master'
 import type { Template } from '@/types/template'
@@ -27,6 +27,22 @@ export function TripForm({ machines, purposes, templates, initial, submitLabel, 
   const [notes, setNotes] = useState(initial?.notes ?? '')
   const [templateId, setTemplateId] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  // Supports both registration and edit screens without retaining values from
+  // the previously selected trip.
+  useEffect(() => {
+    setMachineId(initial?.machineId ?? '')
+    setMachineName(initial?.machineName ?? '')
+    setLocation(initial?.location ?? '')
+    setStartDate(initial?.startDate ?? '')
+    setEndDate(initial?.endDate ?? '')
+    setPurposeId(initial?.purposeId ?? '')
+    setPurposeName(initial?.purposeName ?? '')
+    setCompanions(initial?.companions ?? '')
+    setNotes(initial?.notes ?? '')
+    setTemplateId('')
+    setError(null)
+  }, [initial?.startDate, initial?.endDate, initial?.machineId, initial?.machineName, initial?.location, initial?.purposeId, initial?.purposeName, initial?.companions, initial?.notes])
 
   function handleMachinePick(id: string) {
     setMachineId(id)
