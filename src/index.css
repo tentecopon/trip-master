@@ -305,6 +305,15 @@ a { color: inherit; text-decoration: none; }
 .todo-section-header h3 { font-size: 15px; }
 
 .todo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.todo-date-group-label {
+  list-style: none;
+  margin: 10px 0 3px;
+  color: var(--color-ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.todo-list > .todo-date-group-label:first-child { margin-top: 0; }
 
 .todo-item {
   display: flex;

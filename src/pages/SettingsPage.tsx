@@ -104,6 +104,7 @@ export function SettingsPage() {
       <section className="settings-section">
         <h3>アプリ情報</h3>
         <p>出張管理ツール 全体修正（V0.2）</p>
+        <p>詳細画面のボタン位置変更（V0.2.1）</p>
       </section>
 
       <Modal open={editing !== null} title={editing?.kind === 'machine' ? '装置マスターを編集' : '目的マスターを編集'} onClose={() => setEditing(null)}>

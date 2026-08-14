@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent
 } from '@dnd-kit/core'
@@ -7,7 +7,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Todo, TodoStatus } from '@/types/todo'
-import { todayStr } from '@/utils/date'
+import { formatDateJp, todayStr } from '@/utils/date'
 
 interface RowProps {
   todo: Todo
@@ -26,16 +26,16 @@ function SortableRow({ todo, onStatusCycle, onEdit }: RowProps) {
   return (
     <li ref={setNodeRef} style={style} className={`todo-item todo-status-${todo.status}`}>
       <span className="todo-drag-handle" {...attributes} {...listeners} aria-label="並び替え">⠿</span>
+      <button type="button" className="todo-title-btn" onClick={() => onEdit(todo)}>
+        <span className={todo.status === 'done' ? 'todo-title todo-title-done' : 'todo-title'}>{todo.title}</span>
+        {todo.dueDate && <span className={overdue ? 'todo-due todo-due-overdue' : 'todo-due'}>{todo.dueDate}</span>}
+      </button>
       <button
         type="button"
         className={`todo-status-btn todo-status-btn-${todo.status}`}
         onClick={() => onStatusCycle(todo)}
       >
         {STATUS_LABEL[todo.status]}
-      </button>
-      <button type="button" className="todo-title-btn" onClick={() => onEdit(todo)}>
-        <span className={todo.status === 'done' ? 'todo-title todo-title-done' : 'todo-title'}>{todo.title}</span>
-        {todo.dueDate && <span className={overdue ? 'todo-due todo-due-overdue' : 'todo-due'}>{todo.dueDate}</span>}
       </button>
     </li>
   )
@@ -46,12 +46,13 @@ interface Props {
   onReorder: (orderedIds: string[]) => void
   onStatusCycle: (todo: Todo) => void
   onEdit: (todo: Todo) => void
+  groupByDueDate?: boolean
 }
 
 const NEXT_STATUS: Record<TodoStatus, TodoStatus> = { todo: 'doing', doing: 'done', done: 'todo' }
 
 /** dnd-kit sortable list, scoped to one phase group — each phase keeps its own independent order. §30 */
-export function SortableTodoList({ todos, onReorder, onStatusCycle, onEdit }: Props) {
+export function SortableTodoList({ todos, onReorder, onStatusCycle, onEdit, groupByDueDate = false }: Props) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
   const [items, setItems] = useState(todos.map(t => t.id))
 
@@ -75,18 +76,25 @@ export function SortableTodoList({ todos, onReorder, onStatusCycle, onEdit }: Pr
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
         <ul className="todo-list">
-          {items.map(id => {
+          {(() => {
+            let previousDueDate: string | null | undefined
+            return items.map(id => {
             const todo = byId.get(id)
             if (!todo) return null
+            const startsGroup = groupByDueDate && todo.dueDate !== previousDueDate
+            previousDueDate = todo.dueDate
             return (
-              <SortableRow
-                key={id}
-                todo={todo}
-                onStatusCycle={t => onStatusCycle({ ...t, status: NEXT_STATUS[t.status] })}
-                onEdit={onEdit}
-              />
+              <Fragment key={id}>
+                {startsGroup && <li className="todo-date-group-label">{todo.dueDate ? formatDateJp(todo.dueDate) : '予定日未設定'}</li>}
+                <SortableRow
+                  todo={todo}
+                  onStatusCycle={t => onStatusCycle({ ...t, status: NEXT_STATUS[t.status] })}
+                  onEdit={onEdit}
+                />
+              </Fragment>
             )
-          })}
+            })
+          })()}
         </ul>
       </SortableContext>
     </DndContext>

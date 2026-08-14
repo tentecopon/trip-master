@@ -24,6 +24,10 @@ export function TodoSection({ phase, todos, onCreate, onUpdate, onDelete, onStat
 
   const active = useMemo(() => todos.filter(t => t.status !== 'done'), [todos])
   const done = useMemo(() => todos.filter(t => t.status === 'done'), [todos])
+  const displayedActive = useMemo(() => {
+    if (phase !== 'onsite') return active
+    return [...active].sort((a, b) => (a.dueDate ?? '9999-12-31').localeCompare(b.dueDate ?? '9999-12-31') || a.order - b.order)
+  }, [active, phase])
 
   return (
     <section className="todo-section">
@@ -34,12 +38,13 @@ export function TodoSection({ phase, todos, onCreate, onUpdate, onDelete, onStat
 
       {active.length === 0 && done.length === 0 && <EmptyState message="ToDoはまだありません。" />}
 
-      {active.length > 0 && (
+      {displayedActive.length > 0 && (
         <SortableTodoList
-          todos={active}
+          todos={displayedActive}
           onReorder={ids => onReorder(phase, ids)}
           onStatusCycle={t => onStatusChange(t.id, t.status)}
           onEdit={t => setModalTodo(t)}
+          groupByDueDate={phase === 'onsite'}
         />
       )}
 
@@ -52,15 +57,15 @@ export function TodoSection({ phase, todos, onCreate, onUpdate, onDelete, onStat
             <ul className="todo-list todo-list-done">
               {done.map(t => (
                 <li key={t.id} className="todo-item todo-status-done">
+                  <button type="button" className="todo-title-btn" onClick={() => setModalTodo(t)}>
+                    <span className="todo-title todo-title-done">{t.title}</span>
+                  </button>
                   <button
                     type="button"
                     className="todo-status-btn todo-status-btn-done"
                     onClick={() => onStatusChange(t.id, 'todo')}
                   >
                     完了
-                  </button>
-                  <button type="button" className="todo-title-btn" onClick={() => setModalTodo(t)}>
-                    <span className="todo-title todo-title-done">{t.title}</span>
                   </button>
                 </li>
               ))}
