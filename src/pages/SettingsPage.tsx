@@ -58,9 +58,11 @@ export function SettingsPage() {
         <ul className="master-list">
           {machines.map(m => (
             <li key={m.id}>
-              <span>{m.name}</span>
-              <Button variant="secondary" onClick={() => setEditing({ kind: 'machine', id: m.id, name: m.name })}>編集</Button>
-              <Button variant="danger" onClick={() => removeMachine(m.id)}>削除</Button>
+              <span className="master-name">{m.name}</span>
+              <div className="master-actions">
+                <Button variant="secondary" onClick={() => setEditing({ kind: 'machine', id: m.id, name: m.name })}>編集</Button>
+                <Button variant="danger" onClick={() => removeMachine(m.id)}>削除</Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -75,9 +77,11 @@ export function SettingsPage() {
         <ul className="master-list">
           {purposes.map(p => (
             <li key={p.id}>
-              <span>{p.name}</span>
-              <Button variant="secondary" onClick={() => setEditing({ kind: 'purpose', id: p.id, name: p.name })}>編集</Button>
-              <Button variant="danger" onClick={() => removePurpose(p.id)}>削除</Button>
+              <span className="master-name">{p.name}</span>
+              <div className="master-actions">
+                <Button variant="secondary" onClick={() => setEditing({ kind: 'purpose', id: p.id, name: p.name })}>編集</Button>
+                <Button variant="danger" onClick={() => removePurpose(p.id)}>削除</Button>
+              </div>
             </li>
           ))}
         </ul>
@@ -99,7 +103,7 @@ export function SettingsPage() {
 
       <section className="settings-section">
         <h3>アプリ情報</h3>
-        <p>出張管理ツール ベータ版 (v0.1)</p>
+        <p>出張管理ツール 全体修正（V0.2）</p>
       </section>
 
       <Modal open={editing !== null} title={editing?.kind === 'machine' ? '装置マスターを編集' : '目的マスターを編集'} onClose={() => setEditing(null)}>
