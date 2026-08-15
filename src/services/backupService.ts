@@ -127,6 +127,9 @@ export function validateBackup(raw: string): ValidationOutcome {
   // backups contain absolute date strings, which cannot be converted without
   // knowing the future trip, so retain the Todo and clear only its due date.
   for (const template of data.templates) {
+    if (!template.templateName) {
+      template.templateName = `${template.machineName} / ${template.purposeName}`
+    }
     if (!Array.isArray(template.todos)) {
       return { valid: false, reason: 'テンプレートのToDoが不正です。' }
     }

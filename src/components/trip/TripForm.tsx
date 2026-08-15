@@ -141,7 +141,7 @@ export function TripForm({ machines, purposes, templates, initial, submitLabel, 
           <select className="field-input" value={templateId} onChange={e => setTemplateId(e.target.value)}>
             <option value="">使用しない</option>
             {templates.map(t => (
-              <option key={t.id} value={t.id}>{t.machineName} / {t.purposeName}</option>
+              <option key={t.id} value={t.id}>{t.templateName}</option>
             ))}
           </select>
         </label>

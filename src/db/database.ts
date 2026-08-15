@@ -60,6 +60,22 @@ export class TripManagerDB extends Dexie {
         dueDate: typeof todo.dueDate === 'number' ? todo.dueDate : null
       }))
     }))
+
+    // V0.2.2 — add an explicit template name. Existing records keep a useful
+    // display name derived from their former machine/purpose-based label.
+    this.version(3).stores({
+      trips: 'id, status, startDate, endDate',
+      todos: 'id, tripId, phase, status, dueDate, order',
+      workLogs: 'id, tripId, date, [tripId+date]',
+      templates: 'id, templateName, machineId, purposeId',
+      machineMasters: 'id, name',
+      purposeMasters: 'id, name',
+      deleteLogs: 'id, deletedAt, dataType',
+      settings: 'id',
+      backups: 'id, createdAt'
+    }).upgrade(tx => tx.table('templates').toCollection().modify(template => {
+      template.templateName = template.templateName || `${template.machineName} / ${template.purposeName}`
+    }))
   }
 }
 

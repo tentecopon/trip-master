@@ -58,7 +58,12 @@ export function useWorkLogs(tripId: string | undefined) {
     [reload]
   )
 
+  const remove = useCallback(async (id: string) => {
+    await workLogService.deleteWorkLog(id)
+    await reload()
+  }, [reload])
+
   const todayLog = workLogs.find(w => w.date === todayStr())
 
-  return { workLogs, todayLog, loading, error, reload, start, end, update }
+  return { workLogs, todayLog, loading, error, reload, start, end, update, remove }
 }

@@ -10,6 +10,7 @@ export interface TemplateTodo {
 
 export interface Template {
   id: string
+  templateName: string
   machineId: string | null
   machineName: string
   purposeId: string | null

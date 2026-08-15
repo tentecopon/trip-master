@@ -15,10 +15,11 @@ interface Props {
   onStart: () => Promise<void>
   onEnd: () => Promise<void>
   onUpdate: (id: string, input: { date: string; startTime: string; endTime: string }) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }
 
 /** Today's start/end controls plus the trip's work-time history. §36–§39, §46 */
-export function WorkLogSection({ trip, workLogs, todayLog, onStart, onEnd, onUpdate }: Props) {
+export function WorkLogSection({ trip, workLogs, todayLog, onStart, onEnd, onUpdate, onDelete }: Props) {
   const [editing, setEditing] = useState<WorkLog | null>(null)
   const [pendingAction, setPendingAction] = useState<'start' | 'end' | null>(null)
 
@@ -77,6 +78,7 @@ export function WorkLogSection({ trip, workLogs, todayLog, onStart, onEnd, onUpd
           workLog={editing}
           onClose={() => setEditing(null)}
           onSave={input => onUpdate(editing.id, input)}
+          onDelete={() => onDelete(editing.id)}
         />
       )}
 

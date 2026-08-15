@@ -59,6 +59,10 @@ export async function updateWorkLog(
   await db.workLogs.update(id, { ...input, updatedAt: nowIso() })
 }
 
+export async function deleteWorkLog(id: string): Promise<void> {
+  await db.workLogs.delete(id)
+}
+
 /** §38 — true when `date` falls outside [startDate, endDate], used to trigger the warning dialog. */
 export function isOutsideTripPeriod(date: string, startDate: string, endDate: string): boolean {
   return date < startDate || date > endDate

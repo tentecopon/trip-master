@@ -49,11 +49,11 @@ export function DashboardPage() {
       {rows.length === 0 && <EmptyState message="現在進行中の出張はありません。" />}
 
       {onsite.map(r => (
-        <section key={r.trip.id} className="dashboard-trip-block">
-          <Link to={`/trips/${r.trip.id}`} className="dashboard-trip-header">
+        <Link key={r.trip.id} to={`/trips/${r.trip.id}`} className="dashboard-trip-block dashboard-trip-link">
+          <div className="dashboard-trip-header">
             <span>{r.trip.machineName} / {r.trip.location}</span>
             <TripPhaseBadge phase="onsite" />
-          </Link>
+          </div>
 
           <div className="dashboard-sub">
             <h4>今日のToDo</h4>
@@ -79,7 +79,7 @@ export function DashboardPage() {
               </ul>
             </div>
           )}
-        </section>
+        </Link>
       ))}
 
       {others.length > 0 && (

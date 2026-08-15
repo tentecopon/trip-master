@@ -15,6 +15,7 @@ const PHASE_LABEL: Record<TodoPhase, string> = { before: '出張前', onsite: '�
 
 /** Template editor: machine/purpose header plus an editable TemplateTodo list. §29, §45 */
 export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
+  const [templateName, setTemplateName] = useState(initial?.templateName ?? '')
   const [machineId, setMachineId] = useState(initial?.machineId ?? '')
   const [machineName, setMachineName] = useState(initial?.machineName ?? '')
   const [purposeId, setPurposeId] = useState(initial?.purposeId ?? '')
@@ -25,6 +26,7 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
   // React Router reuses this form when the edit target changes.  Keep its
   // controlled fields in sync with the template that was actually selected.
   useEffect(() => {
+    setTemplateName(initial?.templateName ?? '')
     setMachineId(initial?.machineId ?? '')
     setMachineName(initial?.machineName ?? '')
     setPurposeId(initial?.purposeId ?? '')
@@ -45,8 +47,8 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!machineName.trim() || !purposeName.trim()) {
-      setError('装置・目的は必須です。')
+    if (!templateName.trim() || !machineName.trim() || !purposeName.trim()) {
+      setError('テンプレート名・装置・目的は必須です。')
       return
     }
     if (todos.some(t => !t.title.trim())) {
@@ -58,12 +60,17 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
       return
     }
     setError(null)
-    await onSave({ machineId: machineId || null, machineName, purposeId: purposeId || null, purposeName, todos })
+    await onSave({ templateName: templateName.trim(), machineId: machineId || null, machineName, purposeId: purposeId || null, purposeName, todos })
   }
 
   return (
     <form className="form" onSubmit={handleSubmit}>
       {error && <div className="form-error">{error}</div>}
+
+      <label className="field">
+        <span className="field-label">テンプレート名<span className="required">*</span></span>
+        <input className="field-input" placeholder="テンプレート名を入力" value={templateName} onChange={e => setTemplateName(e.target.value)} />
+      </label>
 
       <label className="field">
         <span className="field-label">装置<span className="required">*</span></span>

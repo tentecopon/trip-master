@@ -2,19 +2,22 @@ import { useEffect, useState } from 'react'
 import type { WorkLog } from '@/types/workLog'
 import { Modal } from '@/components/common/Modal'
 import { Button } from '@/components/common/Button'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 
 interface Props {
   open: boolean
   workLog: WorkLog
   onClose: () => void
   onSave: (input: { date: string; startTime: string; endTime: string }) => void | Promise<void>
+  onDelete: () => void | Promise<void>
 }
 
 /** Manual correction of a WorkLog entry — one of the "save-button" flows (§46). */
-export function WorkLogEditModal({ open, workLog, onClose, onSave }: Props) {
+export function WorkLogEditModal({ open, workLog, onClose, onSave, onDelete }: Props) {
   const [date, setDate] = useState(workLog.date)
   const [startTime, setStartTime] = useState(workLog.startTime)
   const [endTime, setEndTime] = useState(workLog.endTime)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -25,6 +28,12 @@ export function WorkLogEditModal({ open, workLog, onClose, onSave }: Props) {
 
   async function handleSave() {
     await onSave({ date, startTime, endTime })
+    onClose()
+  }
+
+  async function handleDelete() {
+    await onDelete()
+    setConfirmDelete(false)
     onClose()
   }
 
@@ -46,9 +55,19 @@ export function WorkLogEditModal({ open, workLog, onClose, onSave }: Props) {
           </label>
         </div>
         <div className="confirm-actions">
+          <Button variant="danger" onClick={() => setConfirmDelete(true)} type="button">削除</Button>
           <Button variant="ghost" onClick={onClose} type="button">キャンセル</Button>
           <Button variant="primary" onClick={handleSave} type="button">保存</Button>
         </div>
+        <ConfirmDialog
+          open={confirmDelete}
+          title="作業時間を削除しますか？"
+          message="この作業時間の記録を削除します。"
+          confirmLabel="削除"
+          danger
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmDelete(false)}
+        />
       </div>
     </Modal>
   )

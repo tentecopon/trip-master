@@ -122,6 +122,9 @@ export function TripDetailPage() {
         onUpdate={async (id, input) => {
           try { await workLogsApi.update(id, input) } catch (e) { show((e as Error).message, 'error'); throw e }
         }}
+        onDelete={async id => {
+          try { await workLogsApi.remove(id); show('作業時間を削除しました。') } catch (e) { show((e as Error).message, 'error'); throw e }
+        }}
       />
 
       <TodoSection

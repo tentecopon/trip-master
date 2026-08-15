@@ -408,6 +408,7 @@ a { color: inherit; text-decoration: none; }
   padding: 14px 16px;
   margin-bottom: 16px;
 }
+.dashboard-trip-link { display: block; color: inherit; cursor: pointer; }
 .dashboard-trip-header {
   display: flex;
   align-items: center;
