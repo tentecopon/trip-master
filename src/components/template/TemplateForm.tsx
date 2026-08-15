@@ -47,8 +47,8 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!templateName.trim() || !machineName.trim() || !purposeName.trim()) {
-      setError('テンプレート名・装置・目的は必須です。')
+    if (!templateName.trim()) {
+      setError('テンプレート名は必須です。')
       return
     }
     if (todos.some(t => !t.title.trim())) {
@@ -73,7 +73,7 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
       </label>
 
       <label className="field">
-        <span className="field-label">装置<span className="required">*</span></span>
+        <span className="field-label">装置</span>
         <select className="field-input" value={machineId} onChange={e => {
           setMachineId(e.target.value)
           const f = machines.find(m => m.id === e.target.value)
@@ -86,7 +86,7 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
       </label>
 
       <label className="field">
-        <span className="field-label">目的<span className="required">*</span></span>
+        <span className="field-label">目的</span>
         <select className="field-input" value={purposeId} onChange={e => {
           setPurposeId(e.target.value)
           const f = purposes.find(p => p.id === e.target.value)
