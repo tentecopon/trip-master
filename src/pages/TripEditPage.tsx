@@ -34,7 +34,6 @@ export function TripEditPage() {
       <TripForm
         machines={machines}
         purposes={purposes}
-        templates={[]}
         initial={trip}
         submitLabel="保存する"
         onSubmit={handleSubmit}

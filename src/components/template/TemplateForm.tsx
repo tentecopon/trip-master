@@ -102,7 +102,10 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
       <ul className="template-todo-list">
         {todos.map((t, i) => (
           <li key={i} className="template-todo-row">
-            <select className="field-input" value={t.phase} onChange={e => updateRow(i, { phase: e.target.value as TodoPhase })}>
+            <select className="field-input" value={t.phase} onChange={e => {
+              const phase = e.target.value as TodoPhase
+              updateRow(i, { phase, dueDate: phase === 'onsite' ? t.dueDate : null })
+            }}>
               {(Object.keys(PHASE_LABEL) as TodoPhase[]).map(p => <option key={p} value={p}>{PHASE_LABEL[p]}</option>)}
             </select>
             <input
@@ -111,18 +114,20 @@ export function TemplateForm({ machines, purposes, initial, onSave }: Props) {
               value={t.title}
               onChange={e => updateRow(i, { title: e.target.value })}
             />
-            <label className="field">
-              <span className="field-label">開始日から（日後）</span>
-              <input
-                type="number"
-                className="field-input"
-                min="0"
-                step="1"
-                placeholder="未設定"
-                value={t.dueDate ?? ''}
-                onChange={e => updateRow(i, { dueDate: e.target.value === '' ? null : Number(e.target.value) })}
-              />
-            </label>
+            {t.phase === 'onsite' ? (
+              <label className="field">
+                <span className="field-label">開始日から（日後）</span>
+                <input
+                  type="number"
+                  className="field-input"
+                  min="0"
+                  step="1"
+                  placeholder="未設定"
+                  value={t.dueDate ?? ''}
+                  onChange={e => updateRow(i, { dueDate: e.target.value === '' ? null : Number(e.target.value) })}
+                />
+              </label>
+            ) : <span aria-hidden="true" />}
             <Button type="button" variant="danger" onClick={() => removeRow(i)}>削除</Button>
           </li>
         ))}

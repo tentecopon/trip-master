@@ -121,6 +121,9 @@ export function validateBackup(raw: string): ValidationOutcome {
     if (!dateRe.test(t.startDate) || !dateRe.test(t.endDate)) {
       return { valid: false, reason: '不正な日付が含まれています。' }
     }
+    // Backups created before v1.3 did not record template application
+    // history.  Preserve the trip and initialize its history on restore.
+    if (!Array.isArray(t.appliedTemplateIds)) t.appliedTemplateIds = []
   }
 
   // Templates now store due dates as offsets from a trip's start date.  Old

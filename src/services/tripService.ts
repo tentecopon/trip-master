@@ -19,6 +19,7 @@ export async function createTrip(input: TripInput): Promise<Trip> {
     id: generateId(),
     status: 'active',
     completedAt: null,
+    appliedTemplateIds: [],
     createdAt: now,
     updatedAt: now
   }

@@ -16,6 +16,8 @@ export interface Trip {
   notes: string
   status: TripStatus
   completedAt: string | null // ISO 8601
+  /** IDs of template sets already applied to this trip. */
+  appliedTemplateIds: string[]
   createdAt: string // ISO 8601
   updatedAt: string // ISO 8601
 }
@@ -23,5 +25,5 @@ export interface Trip {
 /** Fields collected by TripForm; service assigns id/status/timestamps. */
 export type TripInput = Omit<
   Trip,
-  'id' | 'status' | 'completedAt' | 'createdAt' | 'updatedAt'
+  'id' | 'status' | 'completedAt' | 'appliedTemplateIds' | 'createdAt' | 'updatedAt'
 >

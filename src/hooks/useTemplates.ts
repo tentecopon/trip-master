@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Template } from '@/types/template'
+import type { Trip } from '@/types/trip'
 import * as templateService from '@/services/templateService'
 
 export function useTemplates() {
@@ -45,5 +46,9 @@ export function useTemplates() {
     return templateService.applyTemplate(templateId, tripId)
   }, [])
 
-  return { templates, loading, reload, create, update, remove, applyToTrip }
+  const suggestedForTrip = useCallback((trip: Trip) => {
+    return templateService.getSuggestedTemplates(templates, trip)
+  }, [templates])
+
+  return { templates, loading, reload, create, update, remove, applyToTrip, suggestedForTrip }
 }

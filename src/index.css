@@ -440,6 +440,11 @@ a { color: inherit; text-decoration: none; }
 
 .template-todo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .template-todo-row { display: grid; grid-template-columns: 100px 1fr 150px auto; gap: 8px; align-items: center; }
+.template-suggestion-list { display: flex; flex-direction: column; gap: 8px; }
+.template-suggestion { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.template-suggestion input { width: 22px; height: 22px; }
+.template-suggestion span { display: flex; flex-direction: column; gap: 2px; }
+.template-suggestion small { color: var(--color-ink-soft); }
 
 /* ---------------------------------------------------------------------
    Settings / Masters / Backup

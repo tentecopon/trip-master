@@ -76,6 +76,22 @@ export class TripManagerDB extends Dexie {
     }).upgrade(tx => tx.table('templates').toCollection().modify(template => {
       template.templateName = template.templateName || `${template.machineName} / ${template.purposeName}`
     }))
+
+    // V1.3 template-application history.  Keep existing records usable while
+    // making repeated application of a named template set preventable.
+    this.version(4).stores({
+      trips: 'id, status, startDate, endDate',
+      todos: 'id, tripId, phase, status, dueDate, order',
+      workLogs: 'id, tripId, date, [tripId+date]',
+      templates: 'id, templateName, machineId, purposeId',
+      machineMasters: 'id, name',
+      purposeMasters: 'id, name',
+      deleteLogs: 'id, deletedAt, dataType',
+      settings: 'id',
+      backups: 'id, createdAt'
+    }).upgrade(tx => tx.table('trips').toCollection().modify(trip => {
+      trip.appliedTemplateIds = Array.isArray(trip.appliedTemplateIds) ? trip.appliedTemplateIds : []
+    }))
   }
 }
 
